@@ -4,6 +4,7 @@ dtb-y += exynos/exynos5433-tm2.dtb
 dtb-y += exynos/exynos7-espresso.dtb
 dtb-y += exynos/s5e3830.dtb
 dtbo-y += samsung/a12s/a12s_eur_open_w00_r00.dtbo samsung/a12s/a12s_eur_open_w00_r01.dtbo
+dtbo-y += samsung/m12/m12_eur_open_w00_r00.dtbo samsung/m12/m12_eur_open_w00_r01.dtbo
 
 targets += dtbs
 DTB_LIST  := $(dtb-y) $(dtbo-y)
