@@ -62,7 +62,8 @@ static void parse_dt_light_autobrightness(struct device *dev)
 
 static int set_light_ab_camera_hysteresis(void)
 {
-	int ret = 0;
+	return 0;
+#if 0
 	int buf[4];
 	struct light_autobrightness_data *data = get_sensor(SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS)->data;
 
@@ -85,6 +86,7 @@ static int set_light_ab_camera_hysteresis(void)
 	shub_infof("%d %d %d %d\n", buf[0], buf[1], buf[2], buf[3]);
 
 	return ret;
+#endif
 }
 
 static void report_camera_lux_data(int lux)
@@ -111,6 +113,10 @@ static int enable_light_autobrightness(void)
 	struct light_autobrightness_data *data = get_sensor(SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS)->data;
 
 	data->light_ab_log_cnt = 0;
+	if (!data->camera_lux_en) {
+		data->camera_lux_en = true;
+		report_camera_lux_data(CAMERA_LUX_ENABLE);
+	}
 	return 0;
 }
 
