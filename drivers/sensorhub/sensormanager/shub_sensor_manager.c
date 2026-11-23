@@ -246,7 +246,7 @@ int enable_sensor(int type, char *buf, int buf_len)
 		shub_info("ADD scontext : %s, type %d", sensor->name, type);
 	}
 
-	if (type != SENSOR_TYPE_SCONTEXT)
+	if (type != SENSOR_TYPE_SCONTEXT && type != SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS)
 		ret = shub_send_command(CMD_ADD, type, 0, send_buffer, send_buffer_len);
 
 	if (ret < 0) {
@@ -316,7 +316,7 @@ int disable_sensor(int type, char *buf, int buf_len)
 		shub_info("REMOVE scontext : %s, type %d", sensor->name, type);
 	}
 
-	if (type != SENSOR_TYPE_SCONTEXT)
+	if (type != SENSOR_TYPE_SCONTEXT && type != SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS)
 		ret = shub_send_command(CMD_REMOVE, type, 0, send_buffer, send_buffer_len);
 
 	if (ret < 0) {
@@ -364,7 +364,7 @@ int batch_sensor(int type, uint32_t sampling_period, uint32_t max_report_latency
 		sensor->change_timestamp = get_current_timestamp();
 		memcpy(&buf[0], &sampling_period, 4);
 		memcpy(&buf[4], &max_report_latency, 4);
-		if (type != SENSOR_TYPE_SCONTEXT) {
+		if (type != SENSOR_TYPE_SCONTEXT && type != SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS) {
 			ret = shub_send_command(CMD_CHANGERATE, type, 0, buf, sizeof(buf));
 			if (ret < 0)
 				shub_errf("shub_send_command failed");
@@ -390,6 +390,12 @@ int flush_sensor(int type)
 	if (!get_sensor_enabled(type)) {
 		shub_infof("%s(%d) is not enabled", sensor->name, type);
 		return -EINVAL;
+	}
+
+	if (type == SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS) {
+		char meta[9] = {0, };
+		shub_report_sensordata(type, 0, meta, sensor->report_event_size);
+		return 0;
 	}
 
 	if (type != SENSOR_TYPE_SCONTEXT)
@@ -868,6 +874,9 @@ static void set_sensor_probe_state(void)
 	memcpy(sensor_manager->scontext_probe_state, &system_info->scan_scontext_probe,
 	       sizeof(sensor_manager->scontext_probe_state));
 
+	sensor_manager->sensor_probe_state[0] |= (1ULL << SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS);
+	sensor_manager->sensor_probe_state[0] &= ~(1ULL << SENSOR_TYPE_LIGHT);
+
 	shub_info("sensor probe state : 0x%llx, 0x%llx, scontext probe state : 0x%llx, 0x%llx",
 		  sensor_manager->sensor_probe_state[0], sensor_manager->sensor_probe_state[1],
 		  sensor_manager->scontext_probe_state[0], sensor_manager->scontext_probe_state[1]);
@@ -922,6 +931,16 @@ int get_sensor_spec_from_hub(void)
 			memcpy(&sensor->spec, &specs[i], sizeof(struct sensor_spec_t));
 		else if (specs[i].uid != 0)
 			shub_errf("sensor is probed, but sensor spec is reported");
+	}
+
+	{
+		struct shub_sensor *ab_sensor = get_sensor(SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS);
+		if (ab_sensor && ab_sensor->spec.uid != SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS) {
+			memset(&ab_sensor->spec, 0, sizeof(struct sensor_spec_t));
+			ab_sensor->spec.uid = SENSOR_TYPE_LIGHT_AUTOBRIGHTNESS;
+			strlcpy(ab_sensor->spec.name, "auto_brightness", sizeof(ab_sensor->spec.name));
+			ab_sensor->spec.vendor = 0;
+		}
 	}
 
 	return ret;
