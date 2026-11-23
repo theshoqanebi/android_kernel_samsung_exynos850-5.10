@@ -20,6 +20,8 @@ fw-external-$(CONFIG_TOUCHSCREEN_NT36xxx_HOSTDL_SPI) += tsp_novatek/nt36525_m12s
 							tsp_novatek/nt36525_a12s_dtc.bin tsp_novatek/nt36525_a12s_mp_dtc.bin \
 							tsp_novatek/nt36525_a12s_sharp.bin tsp_novatek/nt36525_a12s_mp_sharp.bin
 
+fw-external-$(CONFIG_SHUB_FIRMWARE_BUILTIN_M12) += sensorhub/shub_nacho_m12.bin
+
 fw-external-$(CONFIG_SENSORS_A96T3X6) += abov/a96t356_a12_main.bin abov/a96t356_a12_sub.bin
 fw-external-$(CONFIG_SENSORS_A96T3X6_M12_ALL) += abov/a96t356_m12s.bin abov/a96t356_m12s_sub.bin
 fw-external-$(CONFIG_SENSORS_A96T3X6_M12_KOR) += abov/a96t356_m12s_kor.bin abov/a96t356_m12s_kor_sub.bin

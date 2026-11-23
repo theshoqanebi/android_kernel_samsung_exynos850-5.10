@@ -6,6 +6,16 @@ config SHUB_FIRMWARE_DOWNLOAD
 	tristate "Sensor hub firmware download"
 	default n
 
+config SHUB_FIRMWARE_BUILTIN_M12
+	bool "Build the Galaxy M12 sensor hub firmware into the kernel"
+	depends on SHUB_FIRMWARE_DOWNLOAD
+	default n
+	help
+	  Embed firmware/sensorhub/shub_nacho_m12.bin in the kernel image.
+	  The M12 device tree requests this file through "os-type", and the
+	  stock M12 vendor partition does not provide it, so without this
+	  option the sensor hub (CHUB) cannot boot.
+
 config SHUB_AP_STATUS_CMD
 	tristate "sensor hub at status command"
 	default n
