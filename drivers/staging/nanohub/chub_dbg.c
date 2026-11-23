@@ -1156,7 +1156,7 @@ void chub_dbg_get_memory(struct device_node *node)
 
 	np = of_parse_phandle(node, "memory-region", 0);
 	if (!np)
-		pr_err("%s memory region not parsed!!");
+		pr_err("%s: memory region not parsed!!\n", __func__);
 	else
 		chub_rmem = of_reserved_mem_lookup(np);
 

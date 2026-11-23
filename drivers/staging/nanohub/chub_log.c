@@ -281,7 +281,7 @@ void chub_printf(struct device *dev, int level, int fw_idx, const char *fmt, ...
 	if (print_info) {
 		chub = dev_get_drvdata(print_info->dev);
 		if (IS_ERR_OR_NULL(chub)) {
-			dev_err(print_info->dev, "%s: chub not available");
+			dev_err(print_info->dev, "%s: chub not available\n", __func__);
 			return;
 		}
 		memset(&log, 0, sizeof(struct logbuf_output));
